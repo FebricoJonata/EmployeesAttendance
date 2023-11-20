@@ -1,0 +1,134 @@
+﻿@page
+@model KawanLamaTest.Pages.Employees.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Absence List</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee[0].NIK)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee[0].Nama)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Employee[0].Tanggal_Absen)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Employee) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NIK)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Nama)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Tanggal_Absen)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+
+<br />
+
+<h2>Employees Grouped by NIK</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                NIK
+            </th>
+            <th>
+                Employee Name
+            </th>
+            <th>
+                Total Absences
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var group in Model.Employee.GroupBy(e => e.NIK))
+        {
+            <tr>
+                <td>
+                    @group.Key
+                </td>
+                <td>
+                    @group.First().Nama
+                </td>
+                <td>
+                    @group.Count()
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<br>
+<h2>Absence Table Count</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                NIK
+            </th>
+            <th>
+                Nama
+            </th>
+            @foreach (var uniqueDate in Model.Employee.Select(e => e.Tanggal_Absen).Distinct())
+            {
+                <th>
+                    @uniqueDate
+                </th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var employeeGroup in Model.Employee.GroupBy(e => new { e.NIK, e.Nama }))
+        {
+            <tr>
+                <td>
+                    @employeeGroup.Key.NIK
+                </td>
+                <td>
+                    @employeeGroup.Key.Nama
+                </td>
+                @foreach (var uniqueDate in Model.Employee.Select(e => e.Tanggal_Absen).Distinct())
+                {
+                    var hasAbsence = employeeGroup.Any(e => e.Tanggal_Absen == uniqueDate);
+                    <td>
+                        @if (hasAbsence)
+                        {
+                            <text>X</text>
+                        }
+                        else
+                        {
+                            <text>&nbsp;</text>
+                        }
+                    </td>
+                }
+            </tr>
+        }
+    </tbody>
+</table>
+
+
